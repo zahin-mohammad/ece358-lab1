@@ -16,27 +16,44 @@ public class Simulation {
     public void runSimulation() {
         ArrayList<Event> eventQueue = generateEvents();
         LinkedList<Event> buffer = new LinkedList<Event>();
+
         int packetArrivalCounter = 0;
         int packetDepartureCounter = 0;
-        int observerCounter = 0;
+
+        double idleTime = 0.0;
+        double lastDepartureTime = 0.0;
+        double observerCounter = 0.0;
+        double packetsDropped = 0.0;
+
+        double averageNumPacketsInBuffer = 0.0;
 
         for (Event event : eventQueue) {
-            System.out.println(event.type.toString().charAt(0) + "\t,at,\t" + event.occurrenceTime);
+//            System.out.println(event.type.toString().charAt(0) + "\t,at,\t" + event.occurrenceTime);
             switch (event.type){
                 case ARRIVAL:
+                    if (buffer.isEmpty()){
+                        idleTime += event.occurrenceTime - lastDepartureTime;
+                    }
                     packetArrivalCounter++;
                     buffer.add(event);
                     break;
                 case DEPARTURE:
+                    lastDepartureTime = event.occurrenceTime;
                     packetDepartureCounter++;
                     buffer.pop();
                     break;
                 case OBSERVE:
+                    averageNumPacketsInBuffer += buffer.size();
                     observerCounter++;
                     break;
             }
         }
-        System.out.println("Buffer Size: "+buffer.size());
+        System.out.printf("Buffer Size: %d\n", buffer.size());
+        System.out.printf("Pidle, the proportion of the time that the buffer is empty: %f\n", idleTime/simulationTime);
+        System.out.printf("Ploss, the probability of a packet being dropped (only relevant for finite buffers): %f\n",
+                packetsDropped/packetArrivalCounter);
+        System.out.printf("E[N], the average number of packets in the buffer during the simulation: %f\n",
+                averageNumPacketsInBuffer/observerCounter);
     }
 
     private  ArrayList<Event> generateEvents() {
