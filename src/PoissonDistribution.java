@@ -1,9 +1,9 @@
 import java.util.Random;
 
 class PoissonDistribution {
-    private int lambda;
+    private double lambda;
     private Random r;
-    PoissonDistribution(int lambda) {
+    PoissonDistribution(double lambda) {
         this.lambda = lambda;
         // seeded with time
         this.r = new Random();

@@ -1,40 +1,74 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 
 public class Simulation {
-    private static double simulationTime = 1000.0;
-
-    public static void main(String[] args) {
-        ArrayList<Event> eventQueue = generateEvents(simulationTime);
-        runSimulation(eventQueue);
+    private double simulationTime = 1000.0;
+    private int c;
+    private int l;
+    private double roh;
+    private double lambda;
+    Simulation(int l, int c, double simulationTime, double roh){
+        this.simulationTime = simulationTime;
+        this.l = l;
+        this.c = c;
+        this.roh = roh;
+        this.lambda = (roh*c)/l;
     }
 
-    private static void runSimulation(ArrayList<Event> eventQueue) {
+    public void runSimulation() {
+        ArrayList<Event> eventQueue = generateEvents();
+        LinkedList<Event> buffer = new LinkedList<Event>();
+
         for (Event event : eventQueue) {
-            System.out.println(event.type.toString() + " at " + event.occurrenceTime);
+            System.out.println(event.type.toString().charAt(0) + "\t,at,\t" + event.occurrenceTime);
+            switch (event.type){
+                case ARRIVAL:
+                    buffer.add(event);
+                    break;
+                case DEPARTURE:
+                    buffer.pop();
+                    break;
+                case OBSERVE:
+                    break;
+            }
         }
+        System.out.println("Buffer Size: "+buffer.size());
     }
 
-    private static ArrayList<Event> generateEvents(double simulationTime) {
+    private  ArrayList<Event> generateEvents() {
         ArrayList<Event> eventQueue = new ArrayList<>();
 
-        // Generate Arrivals
         ArrayList<Arrival> arrivals = new ArrayList<>();
-        PoissonDistribution arrivalDistribution = new PoissonDistribution(1000);
+        ArrayList<Event> departures = new ArrayList<>();
+        ArrayList<Event> observers = new ArrayList<>();
+
+        PoissonDistribution arrivalDistribution = new PoissonDistribution(this.lambda);
+        PoissonDistribution transmissionTimeDistribution = new PoissonDistribution(this.l);
+        PoissonDistribution observerDistribution = new PoissonDistribution(this.lambda*5);
+
         double currentTime = 0.0;
         while (currentTime < simulationTime) {
-            // Hardcoded transmissionTime for now, should be a function of packet size (also needs to be in Arrival)
-            Arrival newArrival = new Arrival(EventType.ARRIVAL, currentTime, 0.001);
+            double departureOccurrenceTime = currentTime;
+            if (!departures.isEmpty() && departures.get(departures.size()-1).occurrenceTime > currentTime){
+                departureOccurrenceTime = departures.get(departures.size()-1).occurrenceTime;
+            }
+            departureOccurrenceTime += transmissionTimeDistribution.generateTimeInterval();
+
+            Arrival newArrival = new Arrival(currentTime, transmissionTimeDistribution.generateTimeInterval());
+            Event newDeparture = new Event(EventType.DEPARTURE, departureOccurrenceTime);
+            departures.add(newDeparture);
             arrivals.add(newArrival);
             currentTime += arrivalDistribution.generateTimeInterval();
         }
 
-        // Generate Departures
-        ArrayList<Event> departures = new ArrayList<>();
-
-
-        // Generate Observers
-        ArrayList<Event> observers = new ArrayList<>();
+        currentTime = 0.0;
+        while (currentTime < simulationTime){
+            double observationTime = observerDistribution.generateTimeInterval();
+            Event newObserver = new Event(EventType.OBSERVE, currentTime);
+            observers.add(newObserver);
+            currentTime += observationTime;
+        }
 
         eventQueue.addAll(arrivals);
         eventQueue.addAll(departures);

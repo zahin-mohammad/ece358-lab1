@@ -11,8 +11,8 @@ class Event {
 class Arrival extends Event {
     double transmissionTime;
 
-    Arrival(EventType type, double occurrenceTime, double transmissionTime) {
-        super(type, occurrenceTime);
+    Arrival(double occurrenceTime, double transmissionTime) {
+        super(EventType.ARRIVAL, occurrenceTime);
         this.transmissionTime = transmissionTime;
     }
 }
