@@ -6,11 +6,18 @@ public class Simulation {
     private double simulationTime = 1000.0;
     private int packetLength;
     private double packetGenerationAvg;
+    private int bufferSize = -1;
 
     Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization){
         this.simulationTime = simulationTime;
         this.packetLength = packetLength;
         this.packetGenerationAvg = (queueUtilization * linkCapacity)/ packetLength;
+    }
+    Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization, int bufferSize){
+        this.simulationTime = simulationTime;
+        this.packetLength = packetLength;
+        this.packetGenerationAvg = (queueUtilization * linkCapacity)/ packetLength;
+        this.bufferSize = bufferSize;
     }
 
     public void runSimulation() {
@@ -28,19 +35,24 @@ public class Simulation {
         double averageNumPacketsInBuffer = 0.0;
 
         for (Event event : eventQueue) {
-//            System.out.println(event.type.toString().charAt(0) + "\t,at,\t" + event.occurrenceTime);
             switch (event.type){
                 case ARRIVAL:
                     if (buffer.isEmpty()){
                         idleTime += event.occurrenceTime - lastDepartureTime;
                     }
                     packetArrivalCounter++;
-                    buffer.add(event);
+                    if (this.bufferSize >-1 && buffer.size()>=this.bufferSize){
+                        packetsDropped++;
+                    }else{
+                        buffer.add(event);
+                    }
                     break;
                 case DEPARTURE:
                     lastDepartureTime = event.occurrenceTime;
                     packetDepartureCounter++;
-                    buffer.pop();
+                    if (!buffer.isEmpty()){
+                        buffer.pop();
+                    }
                     break;
                 case OBSERVE:
                     averageNumPacketsInBuffer += buffer.size();
