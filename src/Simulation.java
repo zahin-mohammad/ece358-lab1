@@ -20,7 +20,7 @@ public class Simulation {
 
         // Generate Arrivals
         ArrayList<Arrival> arrivals = new ArrayList<>();
-        Distribution arrivalDistribution = new Distribution(1000);
+        PoissonDistribution arrivalDistribution = new PoissonDistribution(1000);
         double currentTime = 0.0;
         while (currentTime < simulationTime) {
             // Hardcoded transmissionTime for now, should be a function of packet size (also needs to be in Arrival)

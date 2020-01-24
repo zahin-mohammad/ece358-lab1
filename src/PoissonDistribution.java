@@ -1,14 +1,15 @@
 import java.util.Random;
 
-class Distribution {
+class PoissonDistribution {
     private int lambda;
-    Distribution(int lambda) {
+    private Random r;
+    PoissonDistribution(int lambda) {
         this.lambda = lambda;
+        // seeded with time
+        this.r = new Random();
     }
 
     double generateTimeInterval() {
-        Random r = new Random();
-
         double U = r.nextDouble();
         return (-1.0/lambda) * Math.log(1.0-U);
     }
