@@ -1,8 +1,8 @@
 import java.util.Random;
 
-class Distribution {
+class PoissonDistribution {
     private int lambda;
-    Distribution(int lambda) {
+    PoissonDistribution(int lambda) {
         this.lambda = lambda;
     }
 
