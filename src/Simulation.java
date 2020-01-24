@@ -4,32 +4,35 @@ import java.util.LinkedList;
 
 public class Simulation {
     private double simulationTime = 1000.0;
-    private int c;
-    private int l;
-    private double roh;
-    private double lambda;
-    Simulation(int l, int c, double simulationTime, double roh){
+    private int packetLength;
+    private double packetGenerationAvg;
+
+    Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization){
         this.simulationTime = simulationTime;
-        this.l = l;
-        this.c = c;
-        this.roh = roh;
-        this.lambda = (roh*c)/l;
+        this.packetLength = packetLength;
+        this.packetGenerationAvg = (queueUtilization * linkCapacity)/ packetLength;
     }
 
     public void runSimulation() {
         ArrayList<Event> eventQueue = generateEvents();
         LinkedList<Event> buffer = new LinkedList<Event>();
+        int packetArrivalCounter = 0;
+        int packetDepartureCounter = 0;
+        int observerCounter = 0;
 
         for (Event event : eventQueue) {
             System.out.println(event.type.toString().charAt(0) + "\t,at,\t" + event.occurrenceTime);
             switch (event.type){
                 case ARRIVAL:
+                    packetArrivalCounter++;
                     buffer.add(event);
                     break;
                 case DEPARTURE:
+                    packetDepartureCounter++;
                     buffer.pop();
                     break;
                 case OBSERVE:
+                    observerCounter++;
                     break;
             }
         }
@@ -43,9 +46,9 @@ public class Simulation {
         ArrayList<Event> departures = new ArrayList<>();
         ArrayList<Event> observers = new ArrayList<>();
 
-        PoissonDistribution arrivalDistribution = new PoissonDistribution(this.lambda);
-        PoissonDistribution transmissionTimeDistribution = new PoissonDistribution(this.l);
-        PoissonDistribution observerDistribution = new PoissonDistribution(this.lambda*5);
+        PoissonDistribution arrivalDistribution = new PoissonDistribution(this.packetGenerationAvg);
+        PoissonDistribution transmissionTimeDistribution = new PoissonDistribution(this.packetLength);
+        PoissonDistribution observerDistribution = new PoissonDistribution(this.packetGenerationAvg *5);
 
         double currentTime = 0.0;
         while (currentTime < simulationTime) {
