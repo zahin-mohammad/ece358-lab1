@@ -8,6 +8,13 @@ public class Simulation {
     private double packetGenerationAvg;
     private int bufferSize = -1;
 
+    Simulation(SimulationParams simulationParams){
+        this.simulationTime = simulationParams.simulationTime;
+        this.packetLength = simulationParams.packetLength;
+        this.packetGenerationAvg =
+                (simulationParams.queueUtilization * simulationParams.linkCapacity)/simulationParams.packetLength;
+        this.bufferSize = simulationParams.bufferSize;
+    }
     // Constructor for infinite buffer length
     Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization){
         this.simulationTime = simulationTime;
