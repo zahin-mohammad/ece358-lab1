@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 public class Simulation {
@@ -19,15 +20,12 @@ public class Simulation {
     public SimulationResponse runSimulation() {
         ArrayList<Event> eventQueue = generateEvents();
         LinkedList<Event> buffer = new LinkedList<>();
+        HashSet<Event> packetsDropped = new HashSet<>();
 
         int packetArrivalCounter = 0;
-        int packetDepartureCounter = 0;
-
         double idleTime = 0.0;
         double lastDepartureTime = 0.0;
         double observerCounter = 0.0;
-        double packetsDropped = 0.0;
-
         double averageNumPacketsInBuffer = 0.0;
 
         for (Event event : eventQueue) {
@@ -39,17 +37,17 @@ public class Simulation {
                     }
                     packetArrivalCounter++;
                     if (this.bufferSize >-1 && buffer.size()>=this.bufferSize){
-                        packetsDropped++;
+                       packetsDropped.add(event);
                     }else{
                         buffer.add(event);
                     }
                     break;
                 case DEPARTURE:
-                    if (!buffer.isEmpty()){
+                    if (!packetsDropped.contains(((Departure) event).arrival)){
+                        assert buffer.size() != 0;
                         buffer.pop();
+                        lastDepartureTime = event.occurrenceTime;
                     }
-                    lastDepartureTime = event.occurrenceTime;
-                    packetDepartureCounter++;
                     break;
                 case OBSERVE:
                     averageNumPacketsInBuffer += buffer.size();
@@ -58,15 +56,13 @@ public class Simulation {
             }
         }
         return new SimulationResponse(
-                (idleTime/simulationTime),
-                (packetsDropped/packetArrivalCounter),
-                (averageNumPacketsInBuffer/observerCounter));
+                idleTime / simulationTime,
+                (double) packetsDropped.size() / packetArrivalCounter,
+                averageNumPacketsInBuffer / observerCounter);
     }
 
     private  ArrayList<Event> generateEvents() {
-        // TODO: Include buffer
         ArrayList<Event> eventQueue = new ArrayList<>();
-
         ArrayList<Event> arrivals = new ArrayList<>();
         ArrayList<Event> departures = new ArrayList<>();
         ArrayList<Event> observers = new ArrayList<>();
@@ -86,7 +82,7 @@ public class Simulation {
             departureOccurrenceTime += transmissionTimeDistribution.generateTimeInterval();
 
             Event newArrival = new Event(EventType.ARRIVAL,currentTime);
-            Event newDeparture = new Event(EventType.DEPARTURE, departureOccurrenceTime);
+            Event newDeparture = new Departure(EventType.DEPARTURE, departureOccurrenceTime, newArrival);
             departures.add(newDeparture);
             arrivals.add(newArrival);
             currentTime += arrivalDistribution.generateTimeInterval();
