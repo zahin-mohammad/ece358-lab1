@@ -1,11 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class PoissonDistributionTest {
-    @org.junit.jupiter.api.Test
-    void generateTimeInterval() {
+    public static void main(String[] args) {
+        System.out.println("Generate Time Interval Test");
         int lambda = 75;
         int loop = 1000;
         ArrayList<Double> data = new ArrayList<>();
@@ -15,11 +13,15 @@ class PoissonDistributionTest {
             data.add(distribution.generateTimeInterval());
         }
 
-        assertEquals(1.0/lambda, getMean(data), 0.0009);
-        assertEquals(1.0/(lambda*lambda), getVariance(data), 0.0009);
-    }
+        if (Math.abs((1.0/lambda) - getMean(data)) > 0.0009){
+            System.out.println("FAIL");
+        }
+        if (Math.abs((1.0/(lambda*lambda)) - getVariance(data)) > 0.0009){
+            System.out.println("FAIL");
+        }
 
-    Double getMean(List<Double> data) {
+    }
+    static Double getMean(List<Double> data) {
         double sum = 0;
         for (double a: data ){
             sum+=a;
@@ -27,7 +29,7 @@ class PoissonDistributionTest {
         return sum/data.size();
     }
 
-    Double getVariance(List<Double> data) {
+    static Double getVariance(List<Double> data) {
         Double mean = getMean(data);
         double sum = 0;
         for(double a :data) {
