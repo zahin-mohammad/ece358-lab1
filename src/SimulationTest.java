@@ -2,12 +2,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 class SimulationTest {
 
     public static void main(String[] args) {
-        q3();
+        HashSet<String> argsMap = new HashSet<>(Arrays.asList(args));
+        if (argsMap.contains("q1") || argsMap.contains("Q1") || args.length <=1){
+           q1();
+        }
+        if (argsMap.contains("q3") || argsMap.contains("Q3") || args.length <=1){
+            q3();
+        }
+        if (argsMap.contains("q4") || argsMap.contains("Q4") || args.length <=1){
+            q4();
+        }
 //        System.out.println("Simulation: Vary Time Infinite Buffer");
 //        int simulationTimeStep = 1000;
 //        ArrayList<SimulationResponse> simulationResponseList = new ArrayList<>();
@@ -56,6 +67,7 @@ class SimulationTest {
         for (int i =0; i<loop; i++){
             data.add(distribution.generateTimeInterval());
         }
+        // TODO: Print in a textfile
         System.out.printf("q1 results:\n");
         System.out.printf("\tlambda: %d", lambda);
         System.out.printf("\titerations: %d", loop);
@@ -64,7 +76,6 @@ class SimulationTest {
     }
 
     private static void q3(){
-        System.out.println("Simulation: Vary Queue Utilization Infinite Buffer");
         ArrayList<SimulationResponse> simulationResponseList = new ArrayList<>();
         ArrayList<SimulationParams> simulationParamsList = new ArrayList<>();
 
@@ -78,7 +89,25 @@ class SimulationTest {
         }
 
         try {
-            createCSV(simulationResponseList, simulationParamsList, "./output/vary-queue-utilization-infinite-buffer.csv");
+            createCSV(simulationResponseList, simulationParamsList, "./output/q3.csv");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void q4(){
+        ArrayList<SimulationResponse> simulationResponseList = new ArrayList<>();
+        ArrayList<SimulationParams> simulationParamsList = new ArrayList<>();
+
+        SimulationParams simulationParams = new SimulationParams(
+                1000,2000, 1000000,1.2);
+        Simulation simulation = new Simulation(simulationParams);
+        SimulationResponse simulationResponse  = simulation.runSimulation();
+        simulationResponseList.add(simulationResponse);
+        simulationParamsList.add(simulationParams);
+
+        try {
+            createCSV(simulationResponseList, simulationParamsList, "./output/q4.csv");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,13 +141,13 @@ class SimulationTest {
     ) throws IOException {
 
         PrintWriter printWriter = new PrintWriter(new FileWriter(csvName));
-        printWriter.printf("SimulationTime,BufferSize,LinkCapacity,AvgPacketLength,QueueUtilization,E[N],pIdel,pLoss\n");
+        printWriter.printf("SimulationTime,BufferSize,LinkCapacity,AvgPacketLength,QueueUtilization,E[N],pIdle,pLoss\n");
 
         for (int i = 0; i < simulationResponseList.size(); i++){
             SimulationResponse simulationResponse = simulationResponseList.get(i);
             SimulationParams simulationParams = simulationParamsList.get(i);
 
-            printWriter.printf("%f,%d,%d,%d,%f%f,%f,%f\n",
+            printWriter.printf("%f,%d,%d,%d,%f,%f,%f,%f\n",
                     simulationParams.simulationTime, simulationParams.bufferSize, simulationParams.linkCapacity,
                     simulationParams.packetLength, simulationParams.queueUtilization,
                     simulationResponse.avgPacketsInBuffer, simulationResponse.pIdle, simulationResponse.pLoss);
