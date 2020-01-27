@@ -1,4 +1,6 @@
 #!/bin/bash
 
-javac src/*.java
-java src/SimulationTest
+./clean.sh
+cd src || exit
+javac *.java
+java SimulationTest

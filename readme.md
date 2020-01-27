@@ -3,7 +3,7 @@ Set all bash scripts to be executable.
 ```aidl
 chmod u+x *.sh
 ```
-To run the script use `Simulation.sh`.
+To run the script use `simulation.sh`.
 ```aidl
 ./Simulation.sh
 ```
