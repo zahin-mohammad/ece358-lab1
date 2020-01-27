@@ -5,8 +5,9 @@ import java.util.LinkedList;
 
 public class Simulation {
     private double simulationTime;
-    private int packetLength;
+    private double packetLength;
     private double packetGenerationAvg;
+    private double linkCapacity;
     private int bufferSize = -1;
 
     Simulation(SimulationParams simulationParams){
@@ -14,6 +15,7 @@ public class Simulation {
         this.packetLength = simulationParams.packetLength;
         this.packetGenerationAvg =
                 (simulationParams.queueUtilization * simulationParams.linkCapacity)/simulationParams.packetLength;
+        this.linkCapacity = simulationParams.linkCapacity;
         this.bufferSize = simulationParams.bufferSize;
     }
 
@@ -66,7 +68,7 @@ public class Simulation {
         ArrayList<Event> observers = new ArrayList<>();
 
         PoissonDistribution arrivalDistribution = new PoissonDistribution(this.packetGenerationAvg);
-        PoissonDistribution transmissionTimeDistribution = new PoissonDistribution(this.packetLength);
+        PoissonDistribution transmissionPacketLengthDistribution = new PoissonDistribution(1.0/this.packetLength);
         PoissonDistribution observerDistribution = new PoissonDistribution(this.packetGenerationAvg *5);
 
         double currentTime = 0.0;
@@ -77,7 +79,8 @@ public class Simulation {
             if (!departures.isEmpty() && departures.get(departures.size()-1).occurrenceTime > currentTime){
                 departureOccurrenceTime = departures.get(departures.size()-1).occurrenceTime;
             }
-            departureOccurrenceTime += transmissionTimeDistribution.generateTimeInterval();
+            double transitionTime = transmissionPacketLengthDistribution.generateTimeInterval() / this.linkCapacity;
+            departureOccurrenceTime += transitionTime;
 
             Event newArrival = new Event(EventType.ARRIVAL,currentTime);
             Event newDeparture = new Departure(EventType.DEPARTURE, departureOccurrenceTime, newArrival);
