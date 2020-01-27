@@ -45,11 +45,11 @@ public class Simulation {
                     }
                     break;
                 case DEPARTURE:
-                    lastDepartureTime = event.occurrenceTime;
-                    packetDepartureCounter++;
                     if (!buffer.isEmpty()){
                         buffer.pop();
                     }
+                    lastDepartureTime = event.occurrenceTime;
+                    packetDepartureCounter++;
                     break;
                 case OBSERVE:
                     averageNumPacketsInBuffer += buffer.size();
@@ -64,6 +64,7 @@ public class Simulation {
     }
 
     private  ArrayList<Event> generateEvents() {
+        // TODO: Include buffer
         ArrayList<Event> eventQueue = new ArrayList<>();
 
         ArrayList<Event> arrivals = new ArrayList<>();
