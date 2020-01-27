@@ -20,7 +20,7 @@ public class Simulation {
         this.bufferSize = bufferSize;
     }
 
-    public void runSimulation() {
+    public SimulationResponse runSimulation() {
         ArrayList<Event> eventQueue = generateEvents();
         LinkedList<Event> buffer = new LinkedList<Event>();
 
@@ -60,12 +60,10 @@ public class Simulation {
                     break;
             }
         }
-        System.out.printf("Buffer Size: %d\n", buffer.size());
-        System.out.printf("Pidle, the proportion of the time that the buffer is empty: %f\n", idleTime/simulationTime);
-        System.out.printf("Ploss, the probability of a packet being dropped (only relevant for finite buffers): %f\n",
-                packetsDropped/packetArrivalCounter);
-        System.out.printf("E[N], the average number of packets in the buffer during the simulation: %f\n",
-                averageNumPacketsInBuffer/observerCounter);
+        return new SimulationResponse(
+                (idleTime/simulationTime),
+                (packetsDropped/packetArrivalCounter),
+                (averageNumPacketsInBuffer/observerCounter));
     }
 
     private  ArrayList<Event> generateEvents() {
