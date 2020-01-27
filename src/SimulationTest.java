@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,6 +11,11 @@ class SimulationTest {
 
     public static void main(String[] args) {
         HashSet<String> argsMap = new HashSet<>(Arrays.asList(args));
+        File directory = new File("./output");
+        if (! directory.exists()){
+            directory.mkdir();
+        }
+
         if (argsMap.contains("q1") || argsMap.contains("Q1") || args.length <=1){
            q1();
         }
