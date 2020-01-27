@@ -3,16 +3,18 @@ import java.util.Comparator;
 import java.util.LinkedList;
 
 public class Simulation {
-    private double simulationTime = 1000.0;
+    private double simulationTime;
     private int packetLength;
     private double packetGenerationAvg;
     private int bufferSize = -1;
 
+    // Constructor for infinite buffer length
     Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization){
         this.simulationTime = simulationTime;
         this.packetLength = packetLength;
         this.packetGenerationAvg = (queueUtilization * linkCapacity)/ packetLength;
     }
+    // Constructor for finite buffer length
     Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization, int bufferSize){
         this.simulationTime = simulationTime;
         this.packetLength = packetLength;
@@ -22,7 +24,7 @@ public class Simulation {
 
     public SimulationResponse runSimulation() {
         ArrayList<Event> eventQueue = generateEvents();
-        LinkedList<Event> buffer = new LinkedList<Event>();
+        LinkedList<Event> buffer = new LinkedList<>();
 
         int packetArrivalCounter = 0;
         int packetDepartureCounter = 0;
@@ -37,6 +39,7 @@ public class Simulation {
         for (Event event : eventQueue) {
             switch (event.type){
                 case ARRIVAL:
+                    // Increment idle time whenever packet arrives to an empty buffer
                     if (buffer.isEmpty()){
                         idleTime += event.occurrenceTime - lastDepartureTime;
                     }
@@ -69,7 +72,7 @@ public class Simulation {
     private  ArrayList<Event> generateEvents() {
         ArrayList<Event> eventQueue = new ArrayList<>();
 
-        ArrayList<Arrival> arrivals = new ArrayList<>();
+        ArrayList<Event> arrivals = new ArrayList<>();
         ArrayList<Event> departures = new ArrayList<>();
         ArrayList<Event> observers = new ArrayList<>();
 
@@ -78,14 +81,16 @@ public class Simulation {
         PoissonDistribution observerDistribution = new PoissonDistribution(this.packetGenerationAvg *5);
 
         double currentTime = 0.0;
+        // Generate events up until simulation time
         while (currentTime < simulationTime) {
             double departureOccurrenceTime = currentTime;
+            // Packet has to wait until previous packet has departed
             if (!departures.isEmpty() && departures.get(departures.size()-1).occurrenceTime > currentTime){
                 departureOccurrenceTime = departures.get(departures.size()-1).occurrenceTime;
             }
             departureOccurrenceTime += transmissionTimeDistribution.generateTimeInterval();
 
-            Arrival newArrival = new Arrival(currentTime, transmissionTimeDistribution.generateTimeInterval());
+            Event newArrival = new Event(EventType.ARRIVAL,currentTime);
             Event newDeparture = new Event(EventType.DEPARTURE, departureOccurrenceTime);
             departures.add(newDeparture);
             arrivals.add(newArrival);

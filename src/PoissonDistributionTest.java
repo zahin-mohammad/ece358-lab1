@@ -12,10 +12,11 @@ class PoissonDistributionTest {
         for (int i =0; i<loop; i++){
             data.add(distribution.generateTimeInterval());
         }
-
+        // Mean of the poisson distribution is 1/lambda
         if (Math.abs((1.0/lambda) - getMean(data)) > 0.0009){
             System.out.println("FAIL");
         }
+        // Variance of the poisson distribution is 1/lambda^2
         if (Math.abs((1.0/(lambda*lambda)) - getVariance(data)) > 0.0009){
             System.out.println("FAIL");
         }
@@ -30,7 +31,7 @@ class PoissonDistributionTest {
     }
 
     static Double getVariance(List<Double> data) {
-        Double mean = getMean(data);
+        double mean = getMean(data);
         double sum = 0;
         for(double a :data) {
             sum += (a-mean)*(a-mean);
