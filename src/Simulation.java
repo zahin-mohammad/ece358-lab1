@@ -15,19 +15,6 @@ public class Simulation {
                 (simulationParams.queueUtilization * simulationParams.linkCapacity)/simulationParams.packetLength;
         this.bufferSize = simulationParams.bufferSize;
     }
-    // Constructor for infinite buffer length
-    Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization){
-        this.simulationTime = simulationTime;
-        this.packetLength = packetLength;
-        this.packetGenerationAvg = (queueUtilization * linkCapacity)/ packetLength;
-    }
-    // Constructor for finite buffer length
-    Simulation(int packetLength, int linkCapacity, double simulationTime, double queueUtilization, int bufferSize){
-        this.simulationTime = simulationTime;
-        this.packetLength = packetLength;
-        this.packetGenerationAvg = (queueUtilization * linkCapacity)/ packetLength;
-        this.bufferSize = bufferSize;
-    }
 
     public SimulationResponse runSimulation() {
         ArrayList<Event> eventQueue = generateEvents();
