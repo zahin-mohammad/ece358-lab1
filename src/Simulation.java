@@ -22,19 +22,14 @@ public class Simulation {
         LinkedList<Event> buffer = new LinkedList<>();
         HashSet<Event> packetsDropped = new HashSet<>();
 
-        int packetArrivalCounter = 0;
-        double idleTime = 0.0;
-        double lastDepartureTime = 0.0;
+        double packetArrivalCounter = 0.0;
+        double idleCounter = 0.0;
         double observerCounter = 0.0;
         double averageNumPacketsInBuffer = 0.0;
 
         for (Event event : eventQueue) {
             switch (event.type){
                 case ARRIVAL:
-                    // Increment idle time whenever packet arrives to an empty buffer
-                    if (buffer.isEmpty()){
-                        idleTime += event.occurrenceTime - lastDepartureTime;
-                    }
                     packetArrivalCounter++;
                     if (this.bufferSize >-1 && buffer.size()>=this.bufferSize){
                        packetsDropped.add(event);
@@ -46,17 +41,20 @@ public class Simulation {
                     if (!packetsDropped.contains(((Departure) event).arrival)){
                         assert buffer.size() != 0;
                         buffer.pop();
-                        lastDepartureTime = event.occurrenceTime;
                     }
                     break;
                 case OBSERVE:
+                    // Increment idle time whenever packet arrives to an empty buffer
+                    if (buffer.isEmpty()){
+                        idleCounter++;
+                    }
                     averageNumPacketsInBuffer += buffer.size();
                     observerCounter++;
                     break;
             }
         }
         return new SimulationResponse(
-                idleTime / simulationTime,
+                idleCounter / observerCounter,
                 (double) packetsDropped.size() / packetArrivalCounter,
                 averageNumPacketsInBuffer / observerCounter);
     }
