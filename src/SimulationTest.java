@@ -25,6 +25,9 @@ class SimulationTest {
         if (argsMap.contains("q4") || argsMap.contains("Q4") || args.length <=1){
             q4();
         }
+        if (argsMap.contains("q6") || argsMap.contains("Q6") || args.length <=1){
+            q6();
+        }
     }
 
     private static void q1(){
@@ -82,6 +85,34 @@ class SimulationTest {
 
         try {
             createCSV(simulationResponseList, simulationParamsList, "./output/q4.csv");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void q6(){
+        ArrayList<SimulationResponse> simulationResponseList = new ArrayList<>();
+        ArrayList<SimulationParams> simulationParamsList = new ArrayList<>();
+
+        for (double i = 0.5; i <= 1.5; i += 0.1){
+            SimulationParams simulationParams1 = new SimulationParams(
+                    1000,2000, 1000000,i,10);
+            simulationParamsList.add(simulationParams1);
+            simulationResponseList.add(new Simulation(simulationParams1).runSimulation());
+
+            SimulationParams simulationParams2 = new SimulationParams(
+                    1000,2000, 1000000,i,25);
+            simulationParamsList.add(simulationParams2);
+            simulationResponseList.add(new Simulation(simulationParams2).runSimulation());
+
+            SimulationParams simulationParams3 = new SimulationParams(
+                    1000,2000, 1000000,i,50);
+            simulationParamsList.add(simulationParams3);
+            simulationResponseList.add(new Simulation(simulationParams3).runSimulation());
+        }
+
+        try {
+            createCSV(simulationResponseList, simulationParamsList, "./output/q6.csv");
         } catch (IOException e) {
             e.printStackTrace();
         }
