@@ -8,6 +8,4 @@ public class SimulationResponse {
         this.pLoss = pLoss;
         this.avgPacketsInBuffer = avgPacketsInBuffer;
     }
-
-
 }

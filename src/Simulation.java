@@ -27,7 +27,7 @@ public class Simulation {
         double packetArrivalCounter = 0.0;
         double idleCounter = 0.0;
         double observerCounter = 0.0;
-        double averageNumPacketsInBuffer = 0.0;
+        double bufferSizeCounter = 0.0;
 
         for (Event event : eventQueue) {
             switch (event.type){
@@ -50,7 +50,7 @@ public class Simulation {
                     if (buffer.isEmpty()){
                         idleCounter++;
                     }
-                    averageNumPacketsInBuffer += buffer.size();
+                    bufferSizeCounter += buffer.size();
                     observerCounter++;
                     break;
             }
@@ -58,10 +58,11 @@ public class Simulation {
         return new SimulationResponse(
                 idleCounter / observerCounter,
                 (double) packetsDropped.size() / packetArrivalCounter,
-                averageNumPacketsInBuffer / observerCounter);
+                bufferSizeCounter / observerCounter);
     }
 
     private  ArrayList<Event> generateEvents() {
+
         ArrayList<Event> eventQueue = new ArrayList<>();
         ArrayList<Event> arrivals = new ArrayList<>();
         ArrayList<Event> departures = new ArrayList<>();
