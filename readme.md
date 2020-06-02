@@ -1,3 +1,5 @@
+Packet simulation. Report available [here](https://github.com/zahin-mohammad/ece358-lab1/blob/master/358%20Project%201%20Lab%20Report.pdf)
+
 # Getting Started
 Set all bash scripts to be executable.
 ```aidl
